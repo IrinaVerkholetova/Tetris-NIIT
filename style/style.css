@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background:#e8c566;
+    color: black;
+    font-size: 14px;
+    font-family: 'Balsamiq Sans', cursive;
+}
+
+#title h1{
+    font-size: 75px;
+    color: #d20018;
+    font-family: 'Caveat Brush', cursive;
+    letter-spacing: 0.2em;
+}
+
+#title img {
+    width: 100%;
+    text-align: center;
+    background-attachment: fixed;
+}
+
+#canvas-container {
+    border: 1px solid #646e24;
+    align-items: center;
+}
+
+.panel {
+    text-align: right;
+    font-size: 24px;
+    padding: 0;
+}
+.panel img {
+    width: 50px;
+    background-attachment: fixed;
+}
+
+.button{
+    transition: all .3s linear;
+}
+.button:hover{
+    transform: scale(1.5);
+}
+
+.footer img {
+    width: 25px;
+}

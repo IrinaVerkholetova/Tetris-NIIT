@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+    <link rel="stylesheet" href="style/bootstrap.css">
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class='container'>
+
+            <div id='title' class="row text-center">
+                <div class="col p-2">
+                    <img src="img/newyear.gif" alt="">
+                </div>
+                <div class="col">
+                    <h1>Tetris</h1>
+                </div>
+                <div class="col p-2">
+                    <img src="img/newyear.gif" alt="">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col text-center p-0">
+                    <p>«Тетрис» - головоломка, построенная на использовании геометрических фигур «тетрамино». <br>
+                        «Тетрис» впервые написан в 1984г. Алексеем Пажитновым.</p>
+                    <h4>Правила игры</h4>
+                    <ul class="text-justify">
+                        <li>Случайные фигурки тетрамино падают сверху в прямоугольный стакан 10x20 клеток.</li>
+                        <li>В полёте можно поворачивать фигурку на 90° и двигать её по горизонтали.</li>
+                        <li>Можно ускорять её падение фигуры.</li>
+                        <li>Фигурка летит до тех пор, пока не наткнётся на другую фигурку либо на дно стакана. Если при
+                            этом заполнился горизонтальный ряд из 10 клеток, он пропадает и всё, что выше него, опускается на
+                            одну клетку.</li>
+                        <li>Дополнительно показывается следующая фигурка.</li>
+                        <li>Игра заканчивается, когда новая фигурка не может поместиться в стакан.</li>
+                        <li>Игрок получает очки за каждый заполненный ряд, поэтому его задача — заполнять ряды, не
+                            заполняя сам стакан как можно дольше.</li>
+                    </ul>
+                    <div class="row footer">
+                        <div class="col">
+                            <a target="_blank" href="https://github.com/IrinaVerkholetova">
+                                <img src="img/github.svg" alt="GitHub">
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a target="_blank" href="https://irinaverkholetova.github.io/">
+                                <img src="img/web-project.svg" alt="">
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a target="_blank" href="https://irinaverkholetova.github.io/Frontend-developer-resume/index.html">
+                                <img src="img/resume.svg" alt="Site">
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a target="_blank" href="mailto:verholetovai@gmail.com">
+                                <img src="img/mail.svg" alt="Email">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col text-center p-0">
+                    <canvas id="canvas-container" width="240" height="480"></canvas>
+                    <p>© Верхолетова Ирина</p>
+                </div>
+
+                <div class="col panel">
+                    <div class="row">
+                        <div class="col">Score :</div>
+                        <div id="score" class="col text-left"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Lines : </div>
+                        <div id="lines" class="col text-left"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Level : </div>
+                        <div id="level" class="col text-left"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col">Next : </div>
+                        <div id="nextTetronino" class="col text-left">
+                            <canvas id="canvas-container2" width="96" height="96"></canvas>
+                        </div>
+                    </div>
+
+                    <div class='row justify-content-center'>
+                        <img src="img/up-arrow.svg" alt="">
+                    </div>
+                    <div class='row'>
+                        <div class='col'>
+                            <img src="img/left-arrow.svg" alt="">
+                        </div>
+                        <div class='col text-center'>Управление</div>
+                        <div class='col text-left'>
+                            <img src="img/right-arrow.svg" alt="">
+                        </div>
+                    </div>
+                    <div class='row justify-content-center'>
+                        <img src="img/down-arrow.svg" alt="">
+                    </div>
+
+                    <div class="row text-center pt-5">
+                        <div id="play" class="col button">
+                            <img src="img/play-button.svg" alt="">
+                        </div>
+                        <div id="pause" class="col button">
+                            <img src="img/pause.svg" alt="">
+                        </div>
+                        <div id="gameover" class="col button">
+                            <img src="img/power-button.svg" alt="">
+                            <audio src="audio/game-over.mp3"></audio>
+                        </div>
+                        <div id="restart" class="col button">
+                            <svg viewBox="0 0 172 172" style="fill: #d20018">
+                                <path
+                                    d="M86,6.88c-43.61533,0 -79.12,35.50467 -79.12,79.12c0,43.61533 35.50467,79.12 79.12,79.12c43.61533,0 79.12,-35.50467 79.12,-79.12c0.03509,-2.48118 -1.2685,-4.78904 -3.41161,-6.03987c-2.1431,-1.25083 -4.79369,-1.25083 -6.93679,0c-2.1431,1.25083 -3.4467,3.55869 -3.41161,6.03987c0,36.17891 -29.18109,65.36 -65.36,65.36c-36.17891,0 -65.36,-29.18109 -65.36,-65.36c0,-36.17891 29.18109,-65.36 65.36,-65.36c18.83675,0 35.74811,7.93958 47.66281,20.64h-13.26281c-2.48118,-0.03509 -4.78904,1.2685 -6.03987,3.41161c-1.25083,2.1431 -1.25083,4.79369 0,6.93679c1.25083,2.1431 3.55869,3.4467 6.03987,3.41161h37.84v-37.84c0.02542,-1.85848 -0.7021,-3.6482 -2.01701,-4.96184c-1.3149,-1.31364 -3.10532,-2.03944 -4.96378,-2.01223c-3.79707,0.05565 -6.83116,3.17694 -6.77922,6.97406v15.56734c-14.48061,-15.88829 -35.3368,-25.88734 -58.48,-25.88734z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div id="stopmusic" class="col button">
+                            <svg viewBox="0 0 24 24" style="fill: #d20018">
+                                <path
+                                    d="M17.969,10c0,1.707-0.5,3.366-1.446,4.802c-0.076,0.115-0.203,0.179-0.333,0.179c-0.075,0-0.151-0.022-0.219-0.065c-0.184-0.122-0.233-0.369-0.113-0.553c0.86-1.302,1.314-2.812,1.314-4.362s-0.454-3.058-1.314-4.363c-0.12-0.183-0.07-0.43,0.113-0.552c0.186-0.12,0.432-0.07,0.552,0.114C17.469,6.633,17.969,8.293,17.969,10 M15.938,10c0,1.165-0.305,2.319-0.88,3.339c-0.074,0.129-0.21,0.201-0.347,0.201c-0.068,0-0.134-0.016-0.197-0.052c-0.191-0.107-0.259-0.351-0.149-0.542c0.508-0.9,0.776-1.918,0.776-2.946c0-1.028-0.269-2.046-0.776-2.946c-0.109-0.191-0.042-0.434,0.149-0.542c0.193-0.109,0.436-0.042,0.544,0.149C15.634,7.681,15.938,8.834,15.938,10 M13.91,10c0,0.629-0.119,1.237-0.354,1.811c-0.063,0.153-0.211,0.247-0.368,0.247c-0.05,0-0.102-0.01-0.151-0.029c-0.203-0.084-0.301-0.317-0.217-0.521c0.194-0.476,0.294-0.984,0.294-1.508s-0.1-1.032-0.294-1.508c-0.084-0.203,0.014-0.437,0.217-0.52c0.203-0.084,0.437,0.014,0.52,0.217C13.791,8.763,13.91,9.373,13.91,10 M11.594,3.227v13.546c0,0.161-0.098,0.307-0.245,0.368c-0.05,0.021-0.102,0.03-0.153,0.03c-0.104,0-0.205-0.04-0.281-0.117l-3.669-3.668H2.43c-0.219,0-0.398-0.18-0.398-0.398V7.012c0-0.219,0.179-0.398,0.398-0.398h4.815l3.669-3.668c0.114-0.115,0.285-0.149,0.435-0.087C11.496,2.92,11.594,3.065,11.594,3.227 M7.012,7.41H2.828v5.18h4.184V7.41z M10.797,4.189L7.809,7.177v5.646l2.988,2.988V4.189z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
