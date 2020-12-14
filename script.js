@@ -2,10 +2,11 @@
 const canvas = document.querySelector('#canvas-container');
 const context = canvas.getContext('2d');
 const square = 24; // размер клетки
-const rows = 20; // число строк
-const columns = 10; // число колонок
-let count = 0;
-let gameStart; // старт игры
+const rows = 20; // число строк поля
+const columns = 10; // число колонок поля
+let count = 0; // счетчик
+let speed = 20; // стартовая скорость
+let gameStart = null; // старт игры
 let gameOver = false; // конец игры, неактив на старте
 
 function createGrid(context) { // сетка в canvas
@@ -23,7 +24,7 @@ function createGrid(context) { // сетка в canvas
     context.stroke();
 }
 
-function createPlayfield() { // игровое поле 10*20
+function createPlayfield() { // игровое поле 10*20, заполненное нулями
     let playfield = [];
     for (let row = 0; row < rows; row++) {
         playfield[row] = [];
@@ -34,18 +35,6 @@ function createPlayfield() { // игровое поле 10*20
     return playfield;
 }
 let playfield = createPlayfield();
-
-let buttonRestart = document.querySelector('#restart');
-buttonRestart.addEventListener('click', restart, true);
-
-function restart() {
-    score = 0;
-    lines = 0;
-    level = 0;
-    playfield = createPlayfield();
-    activeFigure = createFigure();
-    nextFigure = createFigure();
-}
 
 const FIGURE = {
     'I': [
@@ -125,17 +114,18 @@ function rotateFigure(matrix) { // поворот матрицы
 }
 
 function outOfBounds(matrix, cellRow, cellCol) { // выход за границы поля
-    for (let row = 0; row < matrix.length; row++) { // отслеживаем фигуру на поле
+    for (let row = 0; row < matrix.length; row++) { // отслеживаем фигуру
         for (let col = 0; col < matrix[row].length; col++) {
             if (matrix[row][col] &&
-                (((playfield[cellRow + row] === undefined) || // выход за границы поля
-                        (playfield[cellRow + row][cellCol + col] === undefined)) ||
-                    playfield[cellRow + row][cellCol + col])) { // пересечение с другой фигурой
-                return false;
+                (((playfield[cellRow + row] === undefined) || // выход за границы
+                        (playfield[cellRow + row][cellCol + col] === undefined)) || // выход влево, вправо
+                    playfield[cellRow + row][cellCol + col]) // пересечение с другой фигурой
+                ) {
+                return false; // дальше двигаться нельзя
             }
         }
     }
-    return true;
+    return true; // всё хорошо, двигаемся
 }
 
 function placeFigure() { // фиксация фигуры
@@ -147,7 +137,7 @@ function placeFigure() { // фиксация фигуры
                 } else {
                     playfield[activeFigure.row + row][activeFigure.col + col] = activeFigure; // запись фигуры в поле
                     // let audioPlace = new Audio('audio/notification.mp3');
-                    audioPlace.play();
+                    audioPlace.play(); // звук упавшей фигуры
                 }
             }
         }
@@ -156,10 +146,10 @@ function placeFigure() { // фиксация фигуры
     upDateFigure(); // обновляем активную и следующую фигуру
 }
 
-function upDateFigure() {
-    activeFigure = nextFigure;
-    nextFigure = createFigure();
-    showNextFigure();
+function upDateFigure() { // обновляем активную и следующую фигуру
+    activeFigure = nextFigure; // в актив помещаем следующую
+    nextFigure = createFigure(); // создаем следующую
+    showNextFigure(); // показываем следующую фигуру в canvas2
 }
 
 function showNextFigure() { // показ следующей фигуры
@@ -184,11 +174,9 @@ let lines = 0; // удаленные ряды
 let linesGame = document.querySelector('#lines');
 linesGame.textContent = lines;
 
-let level = 0; // уровень
+let level = 0; // уровень игры
 let levelGame = document.querySelector('#level');
 levelGame.textContent = level;
-
-let speed = 20; // стартовая скорость
 
 function clearLines() { // удаление ряда и начисление очков
     let fillRows = []; // заполненные ряды
@@ -204,7 +192,7 @@ function clearLines() { // удаление ряда и начисление о�
         } else if (numberOfBlocks < columns) { // если ряд не полностью заполнен, продолжаем
             continue;
         } else if (numberOfBlocks === columns) { // если число заполненных клеток совпадает с числом колонок
-            fillRows.unshift(row); // добавляем индекс ряда в массив в начало
+            fillRows.unshift(row); // добавляем индекс ряда в fillRows в начало
         }
     }
     for (let index of fillRows) { // обход элементов массива по значению в соответствующем порядке, сверху вниз
@@ -259,12 +247,12 @@ function showGameStart() {
 }
 showGameStart();
 
+const audioStart = new Audio('audio/start-tetrisa.mp3');
+const audioPlace = new Audio('audio/notification.mp3');
+const audioClearLines = new Audio('audio/stage-clear.mp3');
+
 let buttonMusic = document.querySelector('#stopmusic');
 buttonMusic.addEventListener('click', stopMusic, true);
-
-let audioStart = new Audio('audio/start-tetrisa.mp3');
-let audioPlace = new Audio('audio/notification.mp3');
-let audioClearLines = new Audio('audio/stage-clear.mp3');
 
 function stopMusic() {
     audioStart.pause();
@@ -304,11 +292,11 @@ function showGameOver() {
     audioGameOver.play();
 }
 
-
 function loopGame() {
     gameStart = requestAnimationFrame(loopGame); // начинаем анимацию
     context.clearRect(0, 0, canvas.width, canvas.height); // очищаем холст
     createGrid(context); // рисуем сетку
+    showNextFigure();
     for (let row = 0; row < rows; row++) { // игровое поле с фигурами
         for (let col = 0; col < columns; col++) {
             if (playfield[row][col]) {
@@ -318,10 +306,10 @@ function loopGame() {
             }
         }
     }
-    if (activeFigure) { // активная фигура
-        if (++count > speed) {
-            activeFigure.row++;
-            count = 0;
+    if (activeFigure) { // активная фигура, если она отсутствует, то будет ложь undefined
+        if (count++ > speed) {
+            activeFigure.row++; // двигаемся вниз
+            count = 0; // счетчик
             if (!outOfBounds(activeFigure.matrix, activeFigure.row, activeFigure.col)) {
                 activeFigure.row--;
                 placeFigure();
@@ -339,8 +327,32 @@ function loopGame() {
     }
 }
 
+let buttonRestart = document.querySelector('#restart');
+buttonRestart.addEventListener('click', restart, true);
+
+function restart() {
+    score = 0;
+    let scoreGame = document.querySelector('#score');
+    scoreGame.textContent = score;
+    lines = 0;
+    let linesGame = document.querySelector('#lines');
+    linesGame.textContent = lines;
+    level = 0;
+    let levelGame = document.querySelector('#level');
+    levelGame.textContent = level;
+    playfield = createPlayfield();
+    activeFigure = createFigure();
+    nextFigure = createFigure();
+    context.clearRect(0, 0, canvas.width, canvas.height); // очищаем холст
+    showGameStart();
+    loopGame();
+}
+
 document.addEventListener('keydown', function (event) {
     switch (event.code) {
+        case 'Enter':
+            loopGame();
+            break;
         case 'ArrowLeft': // LEFT ARROW
             const colLeft = activeFigure.col - 1;
             if (outOfBounds(activeFigure.matrix, activeFigure.row, colLeft)) {
@@ -367,6 +379,9 @@ document.addEventListener('keydown', function (event) {
                 return;
             }
             activeFigure.row = row;
+            break;
+        case 'Space':
+            showGamePause();
             break;
     }
 });
