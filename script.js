@@ -20,7 +20,7 @@ function createGrid(context) { // сетка в canvas
         context.moveTo(0, y);
         context.lineTo(cellX, y);
     }
-    context.strokeStyle = "#646e24"; // цвет сетки
+    context.strokeStyle = "#aa8243"; // цвет сетки
     context.stroke();
 }
 
